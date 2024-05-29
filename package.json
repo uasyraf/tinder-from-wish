@@ -1,0 +1,24 @@
+{
+  "name": "tinder-from-wish",
+  "version": "1.0.0",
+  "description": "Tinder from wish",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uasyraf/tinder-from-wish.git"
+  },
+  "keywords": [
+    "express",
+    "tinder",
+    "js"
+  ],
+  "author": "Ummar Asyraf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uasyraf/tinder-from-wish/issues"
+  },
+  "homepage": "https://github.com/uasyraf/tinder-from-wish#readme"
+}
