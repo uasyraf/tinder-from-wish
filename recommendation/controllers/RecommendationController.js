@@ -1,16 +1,17 @@
 const db = require("../../db");
 
-const insertRecommendations = async (userId, profiles) => {
+const insertRecommendations = (userId, profiles) => {
     return new Promise((resolve, reject) => {
         const timestamp = Math.floor(Date.now() / 1000);
 
-        let placeholders = rows.map(() => "(?, ?, ?)").join(", ");
-        const query = "INSERT INTO recommendations (user_id, profile_id, timestamp) VALUES " + placeholders;
+        let placeholders = profiles.map(() => "(?, ?, ?, ?)").join(", ");
+        const query = "INSERT INTO recommendations (user_id, profile_id, score, timestamp) VALUES " + placeholders;
         let values = [];
 
         profiles.forEach((profile) => {
             values.push(userId);
-            values.push(profile["profile_id"]);
+            values.push(profile["id"]);
+            values.push(profile["score"]);
             values.push(timestamp);
         });
 
@@ -24,33 +25,38 @@ const insertRecommendations = async (userId, profiles) => {
     });
 };
 
-const generateRecommendations = async (userId, randomnessWeight, max) => {
+const generateRecommendations = (userId, randomnessWeight, max) => {
     return new Promise((resolve, reject) => {
         if (randomnessWeight > 1 || randomnessWeight < 0)
             return reject({ error: "randomness weight must be within range 0 < randomnessWeight < 1", data: [] });
 
-        const query = `
-                SELECT 
-                    p.*,
-                    (
-                        CASE 
-                            WHEN LOWER(p.university) = (u.university) THEN 2
-                            ELSE 0
-                        END +
-                        CASE 
-                            WHEN LOWER(p.interests) LIKE '%' || LOWER(u.interests) || '%' THEN 2
-                            ELSE 0
-                        END +
-                        ABS(RANDOM()) * $2
-                    ) AS weight
-                FROM profiles p, profiles u
-                WHERE p.user_id != $1
-                AND u.user_id = $1
-                AND p.gender != u.gender
-                AND p.id NOT IN (SELECT profile_id FROM recommendations WHERE user_id = $1)
-                ORDER BY weight DESC
-                LIMIT $3;
-            `;
+        const randomNumber = Math.floor(Math.random() * 100);
+
+        const query = `        
+            WITH user_profile AS (
+                SELECT * FROM profiles WHERE user_id = $1
+            )
+            SELECT 
+                p.*,
+                (
+                    CASE 
+                        WHEN LOWER(p.university) = LOWER(up.university) THEN 2
+                        ELSE 0
+                    END +
+                    CASE 
+                        WHEN LOWER(p.interests) LIKE '%' || LOWER(up.interests) || '%' THEN 2
+                        ELSE 0
+                    END +
+                    ${randomNumber} * $2
+                ) AS score
+            FROM profiles p, user_profile up
+            WHERE p.user_id != $1
+            AND p.id NOT IN (SELECT profile_id FROM recommendations WHERE user_id = $1)
+            AND up.user_id = $1
+            AND p.gender != up.gender
+            ORDER BY score DESC
+            LIMIT $3;
+        `;
         const values = {
             1: userId,
             2: randomnessWeight,
@@ -67,7 +73,7 @@ const generateRecommendations = async (userId, randomnessWeight, max) => {
     });
 };
 
-const listRecommendations = async (userId) => {
+const listRecommendations = (userId) => {
     return new Promise((resolve, reject) => {
         let startOfDayTimestamp = new Date().setHours(0, 0, 0, 0);
         startOfDayTimestamp = Math.floor(startOfDayTimestamp / 1000);
@@ -76,18 +82,20 @@ const listRecommendations = async (userId) => {
         endOfDayTimestamp = Math.floor(endOfDayTimestamp / 1000);
 
         const query = `
-                SELECT
-                    *
-                FROM profiles
-                WHERE id in (
-                    SELECT 
-                        profile_id
-                    FROM recommendations
-                    WHERE user_id = $1
-                    AND timestamp >= $2
-                    AND timestamp <= $3
-                )
-            `;
+            SELECT
+                profiles.*, recommendations.score
+            FROM profiles
+            LEFT JOIN recommendations ON profiles.id = recommendations.profile_id
+            WHERE profiles.id in (
+                SELECT 
+                    profile_id
+                FROM recommendations
+                WHERE user_id = $1
+                AND timestamp >= $2
+                AND timestamp <= $3
+            )
+            ORDER BY score DESC
+        `;
         const values = {
             1: userId,
             2: startOfDayTimestamp,
@@ -101,32 +109,36 @@ const listRecommendations = async (userId) => {
                 resolve(profiles);
             }
         });
-    })
+    });
 };
 
 const list = async (req, res, next) => {
-    try {
-        const {
-            user: { userId }
-        } = req;
+    const {
+        user: { userId }
+    } = req;
 
-        let profiles = [];
-        db.serialize(async () => {
-            profiles = await listRecommendations(userId);
-
-            if (!profiles.length) {
-                const newProfiles = await generateRecommendations(userId, 0.3, 10);
-                profiles = await insertRecommendations(userId, newProfiles);
+    return listRecommendations(userId)
+        .then((profiles) => {
+            if (!profiles.length)
+                return generateRecommendations(userId, 0.3, 10)
+                    .then((profiles) => {
+                        if (!profiles) {
+                            return []
+                        } else {
+                            return insertRecommendations(userId, profiles)
+                        }
+                    })
+            else {
+                return profiles;
             }
-        });
-
-        return res.status(200).json({
-            status: true,
-            data: profiles,
-        });
-    } catch (err) {
-        next(err);
-    }
+        })
+        .then((profiles) => {
+            return res.status(200).json({
+                status: true,
+                data: profiles,
+            })
+        })
+        .catch(err => next(err));
 };
 
 module.exports = { list };

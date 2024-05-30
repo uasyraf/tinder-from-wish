@@ -3,7 +3,7 @@ const router = require("express").Router();
 const AuthorizationController = require("./controllers/AuthorizationController");
 
 router.post(
-    "/signup",
+    "/register",
     AuthorizationController.register
 );
 

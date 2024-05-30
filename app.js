@@ -18,11 +18,13 @@ app.listen(port, () => {
 // Express routes
 const AuthorizationRoutes = require("./authorization/routes");
 const UserRoutes = require("./user/routes");
+const ProfileRoutes = require("./profile/routes");
 const RecommendationRoutes = require("./recommendation/routes");
 
 // Attach all routes to the app
 app.use("/", AuthorizationRoutes);
 app.use("/user", UserRoutes);
+app.use("/profile", ProfileRoutes);
 app.use("/recommendation", RecommendationRoutes);
 
 // Handle 404s

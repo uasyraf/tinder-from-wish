@@ -4,7 +4,9 @@
   "description": "Tinder from wish",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "init": "node init.js",
+    "populate": "node populate.js"
   },
   "repository": {
     "type": "git",
@@ -26,5 +28,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1"
   }
 }

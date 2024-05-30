@@ -24,7 +24,7 @@ module.exports = {
         if (!token) {
             return res.status(401).json({
                 status: false,
-                error: { message: 'Missing Bearer token in the authorization headers.' }
+                error: { message: 'Missing bearer token in the authorization headers.' }
             })
         }
 
@@ -32,7 +32,7 @@ module.exports = {
             if (err) {
                 return res.status(403).json({
                     status: false,
-                    error: { message: 'Invalid Bearer token provided, please login again.' }
+                    error: { message: 'Invalid bearer token provided, please login again.' }
                 });
             }
 
