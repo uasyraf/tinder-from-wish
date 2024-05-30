@@ -104,12 +104,12 @@ const listRecommendations = async (userId) => {
     })
 };
 
-const list = async (req, res) => {
-    const {
-        user: { userId }
-    } = req;
-
+const list = async (req, res, next) => {
     try {
+        const {
+            user: { userId }
+        } = req;
+
         let profiles = [];
         db.serialize(async () => {
             profiles = await listRecommendations(userId);
@@ -125,10 +125,8 @@ const list = async (req, res) => {
             data: profiles,
         });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({
-            status: false,
-            error: { message: "Error while fetching profile recommendations." },
-        });
+        next(err);
     }
 };
+
+module.exports = { list };

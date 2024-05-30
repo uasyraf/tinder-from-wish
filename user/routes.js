@@ -4,6 +4,8 @@ const router = express.Router();
 // Authenticated middleware
 const isAuthenticatedMiddleware = require("../common/middlewares/IsAuthenticatedMiddleware");
 
+const UserController = require("./controllers/UserController");
+
 router.get(
     "/",
     [isAuthenticatedMiddleware.check],

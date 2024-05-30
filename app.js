@@ -7,9 +7,9 @@ const db = require("./db");
 // Middleware to parse body as JSON
 app.use(Express.json());
 
+
 // Server config
 const { port } = require("./config");
-const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
     console.log("server listening on PORT: ", port);
@@ -31,6 +31,10 @@ app.use((req, res) => {
         error: { message: "Not found" },
     });
 });
+
+// Middleware to handle internal server error
+const ErrorHandlerMiddleware = require("./common/middlewares/ErrorHandlerMiddleware");
+app.use(ErrorHandlerMiddleware.handler);
 
 process.on("SIGINT", () => {
     db.close((err) => {
