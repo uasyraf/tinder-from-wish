@@ -71,7 +71,7 @@ const insertProfile = (profile) => {
 
 const generateDummyData = async () => {
     try {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 100; i++) {
             const username = faker.internet.userName().toLowerCase();
             const password = encryptPassword(faker.internet.password());
             await insertUser(username, password);
