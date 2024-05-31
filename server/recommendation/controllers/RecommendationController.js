@@ -122,11 +122,11 @@ const list = async (req, res, next) => {
             if (profiles.length) oldProfiles = JSON.parse(JSON.stringify(profiles));
 
             if (!profiles.length || profiles.length < 10) {
-                var max = (profiles.length !== 0 && profiles.length < 10) ? 10 - profiles.length : 10;
+                var max = (0 < profiles.length < 10) ? 10 - profiles.length : 10;
 
                 return generateRecommendations(userId, 0.3, max)
                     .then((profiles) => {
-                        if (!profiles) {
+                        if (!profiles.length) {
                             return [];
                         } else {
                             return insertRecommendations(userId, profiles);
@@ -136,8 +136,12 @@ const list = async (req, res, next) => {
                 return profiles;
             }
         })
-        .then(() => {
-            if (oldProfiles.length) return listRecommendations(userId);
+        .then((profiles) => {
+            if (profiles.length === 10) {
+                return profiles;
+            } else {
+                return listRecommendations(userId);
+            }
         })
         .then((profiles) => {
             return res.status(200).json({
