@@ -16,6 +16,19 @@ In /tinder-app directory:
 1. npm install
 2. npm start
 
+## API Endpoints
+API Documentation (WIP)
+1. ```/auth/login``` --- POST login user
+2. ```/auth/register``` --- POST register user
+3. ```/api/profile``` --- GET current user profile, PUT update current user profile, POST create current user profile
+4. ```/api/recommendation``` --- GET list profiles based on recommendations
+
+## React Pages
+1. ```/``` --- Recommendation (Swiping) page
+2. ```/me``` --- User Profile page
+3. ```/login``` --- Login page
+4. ```/signup``` --- Sign Up page
+
 ## Data Structure
 There are three data objects, User, Profile and Recommendation.
 1. User: username and password for authentication stuffs
