@@ -30,9 +30,9 @@ app.use(compression());
 // middleware to parse body as JSON
 app.use(express.json());
 
-const { port } = require("./config");
+const { port } = process.env.PORT | require("./config");
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log("server listening on PORT: ", port);
 });
 
