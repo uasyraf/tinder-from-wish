@@ -5,16 +5,51 @@ import ProfileCard from '../components/ProfileCard';
 import config from '../config';
 import axios, { AxiosRequestConfig } from 'axios';
 
+interface Profile {
+    id: number;
+    user_id: number;
+    name: string;
+    gender: string;
+    location: string;
+    university: string;
+    interests: string;
+}
+
 const Recommendation: React.FC = () => {
     const [cookies] = useCookies(['TOKEN']);
     const [loading, setLoading] = useState(true);
     const [profiles, setProfiles] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [viewCount, setViewCount] = useState(0);
+    const [noProfile, setNoProfile] = useState(true);
 
     useEffect((): any => {
         if (!cookies.TOKEN) window.location.href = '/login';
     }, [cookies.TOKEN]);
+
+    useEffect(() => {
+        const configuration: AxiosRequestConfig = {
+            method: 'get',
+            url: config.endpoints.profile,
+            headers: { 'Authorization': cookies.TOKEN }
+        };
+
+        axios(configuration)
+            .then((result) => {
+                if (result.data.status) {
+                    setNoProfile(false);
+                } else {
+                    alert('You must update your profile first! Click OK to redirect');
+                    window.location.href = '/me';
+                }
+            })
+            .catch((error) => {
+                if (error.response.status === 404) {
+                    alert('You must update your profile first! Click OK to redirect');
+                    window.location.href = '/me';
+                }
+            });
+    }, []);
 
     useEffect(() => {
         const configuration: AxiosRequestConfig = {
@@ -54,7 +89,7 @@ const Recommendation: React.FC = () => {
         setViewCount(prev => prev - 1);
     }
 
-    if (loading) return <>Loading recommendations...</>;
+    if (loading || noProfile) return <>Loading recommendations...</>;
 
     return (
         <Container>

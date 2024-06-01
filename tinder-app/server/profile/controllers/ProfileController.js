@@ -16,12 +16,12 @@ const find = async (req, res, next) => {
                     return res.status(404).json({
                         status: true,
                         profile: null,
-                    })
+                    });
                 } else {
                     return res.status(200).json({
                         status: true,
                         profile: row,
-                    })
+                    });
                 };
             }
         });

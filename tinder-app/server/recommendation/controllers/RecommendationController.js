@@ -82,17 +82,12 @@ const listRecommendations = (userId) => {
         const query = `
             SELECT
                 profiles.*, recommendations.score
-            FROM profiles
-            LEFT JOIN recommendations ON profiles.id = recommendations.profile_id
-            WHERE profiles.id in (
-                SELECT 
-                    profile_id
-                FROM recommendations
-                WHERE user_id = $1
-                AND timestamp >= $2
-                AND timestamp <= $3
-            )
-            ORDER BY score DESC
+            FROM recommendations
+            LEFT JOIN profiles ON recommendations.profile_id = profiles.id
+            WHERE recommendations.user_id = $1
+            AND recommendations.timestamp >= $2
+            AND recommendations.timestamp <= $3
+            ORDER BY recommendations.score DESC;
         `;
         const values = {
             1: userId,
@@ -115,12 +110,8 @@ const list = async (req, res, next) => {
         user: { userId }
     } = req;
 
-    let oldProfiles = [];
-
     return listRecommendations(userId)
         .then((profiles) => {
-            if (profiles.length) oldProfiles = JSON.parse(JSON.stringify(profiles));
-
             if (!profiles.length || profiles.length < 10) {
                 var max = (0 < profiles.length < 10) ? 10 - profiles.length : 10;
 

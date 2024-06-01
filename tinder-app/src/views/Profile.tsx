@@ -57,7 +57,10 @@ const Profile: React.FC = () => {
             })
             .catch((error) => {
                 if (error.response.status === 404) {
-
+                    alert('You havent update your profile, please update if you wanna get married');
+                    setLoading(false);
+                } else {
+                    alert('Internal server error');
                 }
             });
     }, []);
