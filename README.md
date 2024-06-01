@@ -4,6 +4,9 @@ If Tinder was built by Wish
 ## Description
 A cheap Tinder web app, it's a monolithic aplication built using React + Typescript + Express JS + SQLite
 
+## Demo
+https://tinder-from-wish.onrender.com/
+
 ## How to Run
 Pre-requisites:
 1. node package manager (NPM)
