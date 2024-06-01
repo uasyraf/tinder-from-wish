@@ -7,7 +7,7 @@ A cheap Tinder web app, it's a monolithic aplication built using React + Typescr
 ## Demo
 https://tinder-from-wish.onrender.com/
 
-## How to Run
+## How to Run Locally
 Pre-requisites:
 1. node package manager (NPM)
 2. A computer
@@ -15,6 +15,11 @@ Pre-requisites:
 In /tinder-app directory:
 1. npm install
 2. npm start
+
+## If You Want to Start With An Empty DB
+This app comes with built-in SQLite database in directory /server/storage/data.db but for some reason if you want to start fresh, then, go ahead and delete the data.db file and create a new one. Then run these scripts from the /server directory:
+1. ```npm run init``` - Initialize tables
+2. ```npm populate``` - Populate with dummy user data
 
 ## API Endpoints
 API Documentation (WIP)
