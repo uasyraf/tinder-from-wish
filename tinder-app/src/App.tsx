@@ -3,32 +3,32 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
 import ProtectedRoute from './routers/ProtectedRoute';
 import LoginForm from './views/LoginForm';
-// import RegisterForm from './views/RegisterForm';
+import RegisterForm from './views/RegisterForm';
 import Recommendation from './views/Recommendation';
-// import Profile from './views/Profile';
+import Profile from './views/Profile';
 import './App.css';
 
 
 function App() {
-  const [currentView, setCurrentView] = useState('Recommendation');
+  const [currentViewTitle, setcurrentViewTitle] = useState('Recommendation');
   const location = useLocation();
 
   React.useEffect(() => {
     switch (location.pathname) {
       case '/':
-        setCurrentView('Recommendation');
+        setcurrentViewTitle('Recommendation');
         break;
-      case '/profile':
-        setCurrentView('Profile');
+      case '/me':
+        setcurrentViewTitle('My Profile');
         break;
       case '/signup':
-        setCurrentView('Sign Up');
+        setcurrentViewTitle('Sign Up');
         break;
       case '/login':
-        setCurrentView('Login');
+        setcurrentViewTitle('Login');
         break;
       default:
-        setCurrentView('Recommendation');
+        setcurrentViewTitle('Recommendation');
         break;
     }
   }, [location.pathname]);
@@ -38,6 +38,7 @@ function App() {
       <Row className='justify-content-center'>
         <Col className='text-center'>
           <h1>Tinder from Wish!</h1>
+          <h2>{currentViewTitle}</h2>
         </Col>
       </Row>
 
@@ -45,10 +46,10 @@ function App() {
         <Route path='/' element={<ProtectedRoute />}>
           <Route path='/' element={<Recommendation />} />
         </Route>
-        {/* <Route path='/profile' element={<ProtectedRoute />}>
-          <Route path='/profile' element={<Profile currentView={currentView} />} />
+        <Route path='/me' element={<ProtectedRoute />}>
+          <Route path='/me' element={<Profile />} />
         </Route>
-        <Route path='/signup' element={<RegisterForm currentView={currentView} />} /> */}
+        <Route path='/signup' element={<RegisterForm />} />
         <Route path='/login' element={<LoginForm />} />
       </Routes>
     </Container>
