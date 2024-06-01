@@ -1,8 +1,8 @@
 const helmet = require("helmet");
 const compression = require("compression");
 
-const Express = require("express");
-const app = Express();
+const express = require("express");
+const app = express();
 
 // set csp headers to allow bootstrap and jquery
 app.use(
@@ -16,21 +16,18 @@ app.use(
 // compress all routes for performance
 app.use(compression());
 
+// limit requests
 const RateLimit = require("express-rate-limit");
 const limiter = RateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute window
-    max: 20,
+    max: 100,
 });
 
 app.use(limiter);
 
-// sqlite connection
-const db = require("./db");
-
 // middleware to parse body as JSON
-app.use(Express.json());
+app.use(express.json());
 
-// Server config
 const { port } = require("./config");
 
 app.listen(port, () => {
@@ -43,22 +40,34 @@ const UserRoutes = require("./user/routes");
 const ProfileRoutes = require("./profile/routes");
 const RecommendationRoutes = require("./recommendation/routes");
 
-app.use("/", AuthorizationRoutes);
-app.use("/user", UserRoutes);
-app.use("/profile", ProfileRoutes);
-app.use("/recommendation", RecommendationRoutes);
+app.use("/auth", AuthorizationRoutes);
+app.use("/api/user", UserRoutes);
+app.use("/api/profile", ProfileRoutes);
+app.use("/api/recommendation", RecommendationRoutes);
 
-// 404s
-app.use((req, res) => {
+// expose static files and react app to client
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "..", "build")));
+app.use(express.static("public"));
+
+app.use((req, res, next) => {
+    res.sendFile(path.join(__dirname, "..", "build", "index.html"));
+});
+
+app.use((req, res) => { // not found route
     return res.status(404).json({
         error: { message: "Not found" },
     });
 });
 
 // middleware to handle internal server error
-const ErrorHandlerMiddleware = require("./common/middlewares/ErrorHandlerMiddleware");
-app.use(ErrorHandlerMiddleware.handler);
+const errorHandlerMiddleware = require("./common/middlewares/ErrorHandlerMiddleware");
 
+app.use(errorHandlerMiddleware.handler);
+
+// close sqlite connection
+const db = require("./db");
 process.on("SIGINT", () => {
     db.close((err) => {
         if (err) {
@@ -68,4 +77,4 @@ process.on("SIGINT", () => {
         }
         process.exit("successfully shut down app");
     });
-})
+});

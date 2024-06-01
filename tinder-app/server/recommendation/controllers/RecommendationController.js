@@ -146,7 +146,7 @@ const list = async (req, res, next) => {
         .then((profiles) => {
             return res.status(200).json({
                 status: true,
-                data: profiles,
+                profiles: profiles,
             })
         })
         .catch(err => next(err));
