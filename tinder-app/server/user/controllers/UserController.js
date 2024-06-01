@@ -22,7 +22,7 @@ const find = async (req, res, next) => {
 
                 return res.status(200).json({
                     status: true,
-                    data: row,
+                    user: row,
                 });
             }
         });
@@ -45,7 +45,7 @@ const list = async (req, res, next) => {
             } else {
                 return res.status(200).json({
                     status: true,
-                    data: rows,
+                    users: rows,
                 });
             }
         });

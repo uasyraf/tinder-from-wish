@@ -30,8 +30,6 @@ const generateRecommendations = (userId, randomnessWeight, max) => {
         if (randomnessWeight > 1 || randomnessWeight < 0)
             return reject({ error: "randomness weight must be within range 0 < randomnessWeight < 1", data: [] });
 
-        const randomNumber = Math.floor(Math.random() * 100);
-
         const query = `        
             WITH user_profile AS (
                 SELECT * FROM profiles WHERE user_id = $1
@@ -47,7 +45,7 @@ const generateRecommendations = (userId, randomnessWeight, max) => {
                         WHEN LOWER(p.interests) LIKE '%' || LOWER(up.interests) || '%' THEN 2
                         ELSE 0
                     END +
-                    ${randomNumber} * $2
+                    ABS(RANDOM() % 10000) * $2
                 ) AS score
             FROM profiles p, user_profile up
             WHERE p.user_id != $1
@@ -117,25 +115,38 @@ const list = async (req, res, next) => {
         user: { userId }
     } = req;
 
+    let oldProfiles = [];
+
     return listRecommendations(userId)
         .then((profiles) => {
-            if (!profiles.length)
-                return generateRecommendations(userId, 0.3, 10)
+            if (profiles.length) oldProfiles = JSON.parse(JSON.stringify(profiles));
+
+            if (!profiles.length || profiles.length < 10) {
+                var max = (0 < profiles.length < 10) ? 10 - profiles.length : 10;
+
+                return generateRecommendations(userId, 0.3, max)
                     .then((profiles) => {
-                        if (!profiles) {
-                            return []
+                        if (!profiles.length) {
+                            return [];
                         } else {
-                            return insertRecommendations(userId, profiles)
+                            return insertRecommendations(userId, profiles);
                         }
-                    })
-            else {
+                    });
+            } else {
                 return profiles;
+            }
+        })
+        .then((profiles) => {
+            if (profiles.length === 10) {
+                return profiles;
+            } else {
+                return listRecommendations(userId);
             }
         })
         .then((profiles) => {
             return res.status(200).json({
                 status: true,
-                data: profiles,
+                profiles: profiles,
             })
         })
         .catch(err => next(err));

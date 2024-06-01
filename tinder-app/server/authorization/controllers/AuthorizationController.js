@@ -42,13 +42,12 @@ const register = async (req, res, next) => {
 
                 return res.status(200).json({
                     status: true,
-                    data: {
-                        user: {
-                            id: this.lastID,
-                            username: payload.username,
-                        },
-                        token: accessToken,
-                    }
+                    user: {
+                        id: this.lastID,
+                        username: payload.username,
+                        password: encryptedPassword,
+                    },
+                    token: accessToken,
                 });
             }
         });
@@ -88,13 +87,9 @@ const login = async (req, res, next) => {
 
                 return res.status(200).json({
                     status: true,
-                    data: {
-                        user: {
-                            id: row.id,
-                            username: row.username,
-                        },
-                        token: accessToken,
-                    }
+                    user: row,
+                    token: accessToken,
+
                 });
             }
         });
