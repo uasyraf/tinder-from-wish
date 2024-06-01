@@ -1,5 +1,28 @@
 const db = require("../../db");
 
+const find = async (req, res, next) => {
+    try {
+        const {
+            user: { userId }
+        } = req;
+
+        const query = "SELECT * FROM profiles WHERE user_id = ?";
+
+        db.run(query, [userId], (err) => {
+            if (err) {
+                return next(err);
+            } else {
+                return res.status(200).json({
+                    status: true,
+                    data: { message: "Profile retrieved successfully for user" },
+                });
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 const create = async (req, res, next) => {
     try {
         const {
@@ -92,4 +115,4 @@ const update = async (req, res, next) => {
     }
 }
 
-module.exports = { create, update }
+module.exports = { find, create, update }

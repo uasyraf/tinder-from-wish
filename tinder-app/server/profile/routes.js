@@ -6,6 +6,12 @@ const isAuthenticatedMiddleware = require("../common/middlewares/IsAuthenticated
 
 const ProfileController = require("./controllers/ProfileController");
 
+router.get(
+    "/",
+    [isAuthenticatedMiddleware.check],
+    ProfileController.find,
+);
+
 router.post(
     "/",
     [isAuthenticatedMiddleware.check],
