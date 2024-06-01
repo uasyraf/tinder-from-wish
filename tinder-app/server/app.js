@@ -9,6 +9,8 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+            "connect-src": ["'self'", 'https://robohash.org'],
+            "img-src": ["'self'", 'https://robohash.org'],
         },
     }),
 );
@@ -17,13 +19,13 @@ app.use(
 app.use(compression());
 
 // limit requests
-const RateLimit = require("express-rate-limit");
-const limiter = RateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute window
-    max: 100,
-});
+// const RateLimit = require("express-rate-limit");
+// const limiter = RateLimit({
+//     windowMs: 1 * 60 * 1000, // 1 minute window
+//     max: 100,
+// });
 
-app.use(limiter);
+// app.use(limiter);
 
 // middleware to parse body as JSON
 app.use(express.json());

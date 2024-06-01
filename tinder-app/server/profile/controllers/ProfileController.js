@@ -8,14 +8,21 @@ const find = async (req, res, next) => {
 
         const query = "SELECT * FROM profiles WHERE user_id = ?";
 
-        db.run(query, [userId], (err) => {
+        db.get(query, [userId], (err, row) => {
             if (err) {
                 return next(err);
             } else {
-                return res.status(200).json({
-                    status: true,
-                    data: { message: "Profile retrieved successfully for user" },
-                });
+                if (!row) {
+                    return res.status(404).json({
+                        status: true,
+                        profile: null,
+                    })
+                } else {
+                    return res.status(200).json({
+                        status: true,
+                        profile: row,
+                    })
+                };
             }
         });
     } catch (err) {
@@ -51,14 +58,22 @@ const create = async (req, res, next) => {
             6: interests,
         };
 
-        db.run(query, values, (err) => {
+        db.run(query, values, function (err) {
             if (err) {
                 return next(err);
             } else {
-                return res.status(200).json({
-                    status: true,
-                    data: { message: "Profile created successfully for user" },
-                });
+                const query = "SELECT * FROM profiles WHERE user_id = ?";
+
+                db.get(query, [userId], (err, row) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    return res.status(200).json({
+                        status: true,
+                        profile: row,
+                    });
+                })
             }
         });
     } catch (err) {
@@ -104,9 +119,23 @@ const update = async (req, res, next) => {
             if (err) {
                 return next(err);
             } else {
-                return res.status(200).json({
-                    status: true,
-                    data: { message: "Profile updated successfully for user" },
+                db.run(query, values, function (err) {
+                    if (err) {
+                        return next(err);
+                    } else {
+                        const query = "SELECT * FROM profiles WHERE user_id = ?";
+
+                        db.get(query, [userId], (err, row) => {
+                            if (err) {
+                                return next(err);
+                            }
+
+                            return res.status(200).json({
+                                status: true,
+                                profile: row,
+                            });
+                        })
+                    }
                 });
             }
         });

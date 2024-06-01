@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import { redirect } from 'react-router-dom';
 import config from '../config';
 import axios from 'axios';
 
 
 const RegisterForm: React.FC = () => {
+    const [cookies, setCookie] = useCookies(['TOKEN']);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [register, setRegister] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect((): any => {
+        if (cookies.TOKEN) {
+            window.location.href = '/';
+        } else {
+            setLoading(false);
+        }
+    }, [cookies.TOKEN]);
 
     const handleSubmit = (e: React.SyntheticEvent<any>) => {
         e.preventDefault();
 
         const configuration = {
             method: 'post',
-            url: 'https://nodejs-mongodb-auth-app.herokuapp.com/register',
+            url: config.endpoints.register,
             data: {
                 username,
                 password,
@@ -25,26 +33,35 @@ const RegisterForm: React.FC = () => {
 
         axios(configuration)
             .then((result) => {
-                setRegister(true);
+                if (result.data.status) {
+                    setCookie('TOKEN', result.data.token, {
+                        path: '/',
+                    });
+                    window.location.href = '/';
+                } else {
+                    alert('Unknown error');
+                }
             })
             .catch((error) => {
-                error = new Error();
+                alert('Internal server error');
             });
     };
 
+    if (loading) return <></>;
+
     return (
         <>
-            <h2>Register</h2>
+            <h2>Sign Up</h2>
             <Form onSubmit={(e) => handleSubmit(e)}>
                 {/* username */}
                 <Form.Group controlId='formBasicEmail'>
-                    <Form.Label>Email address</Form.Label>
+                    <Form.Label>Username</Form.Label>
                     <Form.Control
                         type='username'
                         name='username'
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder='Enter username'
+                        placeholder='Username'
                     />
                 </Form.Group>
 
@@ -64,17 +81,19 @@ const RegisterForm: React.FC = () => {
                 <Button
                     variant='primary'
                     type='submit'
+                    className='mt-3'
                     onClick={(e) => handleSubmit(e)}
                 >
-                    Register
+                    Sign Up
                 </Button>
 
-                {/* display success message */}
-                {register ? (
-                    <p className='text-success'>You Are Registered Successfully</p>
-                ) : (
-                    <p className='text-danger'>You Are Not Registered</p>
-                )}
+                <Row className='mt-2'>
+                    <Col>
+                        <a href={config.appBaseUrl + '/login'}>
+                            Already have an account? Login here
+                        </a>
+                    </Col>
+                </Row>
             </Form>
         </>
     );

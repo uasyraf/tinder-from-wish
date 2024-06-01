@@ -6,6 +6,7 @@ import LoginForm from './views/LoginForm';
 import RegisterForm from './views/RegisterForm';
 import Recommendation from './views/Recommendation';
 import Profile from './views/Profile';
+import config from './config'
 import './App.css';
 
 
@@ -16,7 +17,7 @@ function App() {
   React.useEffect(() => {
     switch (location.pathname) {
       case '/':
-        setcurrentViewTitle('Recommendation');
+        setcurrentViewTitle('Profile Recommendations');
         break;
       case '/me':
         setcurrentViewTitle('My Profile');
@@ -28,7 +29,7 @@ function App() {
         setcurrentViewTitle('Login');
         break;
       default:
-        setcurrentViewTitle('Recommendation');
+        setcurrentViewTitle('Profile Recommendations');
         break;
     }
   }, [location.pathname]);
@@ -38,7 +39,7 @@ function App() {
       <Row className='justify-content-center'>
         <Col className='text-center'>
           <h1>Tinder from Wish!</h1>
-          <h2>{currentViewTitle}</h2>
+          <h4>{currentViewTitle}</h4>
         </Col>
       </Row>
 
