@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import { redirect } from 'react-router-dom';
 import config from '../config';
 import axios from 'axios';
 
@@ -12,9 +11,9 @@ const LoginForm: React.FC = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    useEffect((): any => {
         if (cookies.TOKEN) {
-            redirect('/');
+            window.location.href = '/';
         } else {
             setLoading(false);
         }
@@ -55,9 +54,7 @@ const LoginForm: React.FC = () => {
             });
     };
 
-    if (loading) {
-        return <></>;
-    }
+    if (loading) return <></>;
 
     return (
         <>
@@ -93,6 +90,14 @@ const LoginForm: React.FC = () => {
                 >
                     Login
                 </Button>
+                <Row className='mt-2'>
+                    <Col>
+                        <a href={config.appBaseUrl + '/signup'}>
+                            Sign Up
+                        </a>
+                    </Col>
+                </Row>
+
             </Form >
         </>
     );
